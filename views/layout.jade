@@ -1,0 +1,22 @@
+include lib
+
+!!! xml
+!!! 5
+html
+  head
+    title= title
+    meta(charset="UTF-8")
+    meta(name="description", content="Sound test with Audiolet")
+    meta(name="author", content="Max Nordlund <maxno@kth.se>")
+    meta(name="author", content="Johan Fogelström <johfog@kth.se>")
+    block styles
+      //- link(rel="stylesheet", href="/style/select2.css")
+      link(rel="stylesheet", href="/style/style.css")
+    block scripts
+      script(src="/javascript/jquery.js")
+      //- script(src="/javascript/angular.js")
+      //- script(src="/javascript/angular-ui.js")
+      //- script(src="/javascript/select2.js")
+      script(src="/javascript/Audiolet.js")
+  body
+    block content
