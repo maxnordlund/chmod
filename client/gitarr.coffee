@@ -1,6 +1,6 @@
 class Synth extends AudioletGroup
   constructor: (audiolet, frequency) ->
-    super [audiolet, 0, 1]...
+    super audiolet, 0, 1
     @sine = new Sine @audiolet, frequency
     @modulator = new Saw @audiolet, 2 * frequency
     @modulatorMulAdd = new MulAdd @audiolet, frequency / 2, frequency
@@ -47,45 +47,59 @@ class KarplusStrong extends AudioletNode
     @index++
     if @index >= @period
       @index = 0
+      console.log @audiolet.device.sampleRate / @period if @firstRun
       @firstRun = false
 
   toString: -> "Karplus-Strong"
 
 class GitarrString extends AudioletGroup
-  constructor: (audiolet, frequency, mix, roomSize, damping) ->
-    super [audiolet, 0, 1]...
+  constructor: (audiolet, frequency) ->
+    super audiolet, 0, 1
 
-    @noise = [
-      new WhiteNoise @audiolet
-      new WhiteNoise @audiolet
-      new WhiteNoise @audiolet
-    ]
+    @noise = new WhiteNoise @audiolet
     @gain = new Gain @audiolet
-    @envelope = new PercussiveEnvelope @audiolet, 1, 0.2, 0.5,
+    @envelope = new PercussiveEnvelope @audiolet, 0, 0.2, 0.5,
       ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
-    @effect = new Reverb @audiolet, mix, roomSize, damping
 
     @main  = new KarplusStrong @audiolet, frequency
-    @above = new KarplusStrong @audiolet, frequency * 1.005
-    @below = new KarplusStrong @audiolet, frequency * 0.995
+    @noise.connect @main
 
-    @addOther = new Add @audiolet
-    @addFinal = new Add @audiolet
-
-    @noise[0].connect @main
-    @noise[1].connect @above
-    @noise[2].connect @below
-
-    @above.connect @addOther, 0, 0
-    @below.connect @addOther, 0, 1
-
-    @main.connect @addFinal, 0, 0
-    @addOther.connect @addFinal, 0, 1
-
-    @addFinal.connect @gain
+    @main.connect @gain
     @envelope.connect @gain, 0, 1
-    @gain.connect @effect
-    @effect.connect @outputs[0]
+    @gain.connect @outputs[0]
+
+class Gitarr extends AudioletGroup
+  constructor: (audiolet, arr) ->
+    super audiolet, 0, 1
+    add = new Add @audiolet
+    add.connect @outputs[0]
+    window.strings = []
+    for frequency in arr
+      tmp = new Add @audiolet
+      time = do Math.random
+      delay = new Delay @audiolet, time, time
+      string = new GitarrString @audiolet, frequency
+      string.connect delay
+      strings.push string
+      delay.connect add, 0, 1
+      add.connect tmp
+      add = tmp
+
+    console.log "Done with prep"
+
+    for string in strings
+      string.envelope.gate.setValue 1
+
+class Link extends AudioletGroup
+  constructor: (audiolet, frequency, wait) ->
+    super audiolet, 0, 1
+    sound = new GitarrString audiolet, frequency
+    delay = new Delay audiolet, wait, wait
+    adder = new Add audiolet
+
+    sound.connect adder, 0, 1
+    delay.connect adder
+    adder.connect @outputs[0]
 
 class Range
   constructor: (id) ->
@@ -99,6 +113,41 @@ class Range
     @output.text @value
     return true
 
+# See http://en.wikipedia.org/wiki/Piano_key_frequencies
+note = (n) -> 440 * Math.pow 2, (n - 49) / 12
+
+#+ Jonas Raoni Soares Silva
+#@ http://jsfromhell.com/array/shuffle [v1.0]
+shuffle = (o) -> #v1.0
+  j = undefined
+  x = undefined
+  i = o.length
+
+  while i
+    j = parseInt(Math.random() * i)
+    x = o[--i]
+    o[i] = o[j]
+    o[j] = x
+  o
+
+class Simple
+  constructor: (arr) ->
+    @index = 0
+    @notes = []
+    for tune in arr
+      @notes.push note tune
+    shuffle @notes
+
+  next: ->
+    tune = @notes[@index]
+    unless tune?
+      shuffle @notes
+      @index = 0
+      return do @next
+    @index++
+    console.log tune
+    return tune
+
 $ ->
   frequency = new Range "frequency"
   mix       = new Range "mix"
@@ -110,7 +159,28 @@ $ ->
   $play = $("#play")
   $play.on "click", (event) ->
     console.log frequency.value, mix.value, roomSize.value, damping.value
-    sound = new GitarrString audiolet, frequency.value, mix.value, roomSize.value, damping.value
-    sound.connect audiolet.output
-    window.sound = sound
+    # sound = new GitarrString audiolet, frequency.value
+    # sound = new Gitarr audiolet, [200, 440, 200, 440, 560]
+    # sound.connect audiolet.output
+    out = audiolet.output
+    arr = [40, 42, 44, 45, 47, 49]
+    window.arr = arr
+    wait = 0.2
+    pattern = new Simple arr
+    total = 0
+    # for tune in arr
+    while total < 10
+      freq  = do pattern.next
+      continue unless freq?
+      # wait  = do Math.random
+      sound = new GitarrString audiolet, freq
+      delay = new Delay audiolet, wait, wait
+      adder = new Add audiolet
+
+      sound.connect adder, 0, 1
+      delay.connect adder
+      adder.connect out
+
+      out = delay
+      total++
     return true
