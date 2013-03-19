@@ -1,9 +1,9 @@
 class Synth extends AudioletGroup
   constructor: (audiolet, frequency) ->
     super [audiolet, 0, 1]...
-    @sine = new Sine @audiolet, frequency.value
-    @modulator = new Saw @audiolet, 2 * frequency.value
-    @modulatorMulAdd = new MulAdd @audiolet, frequency.value / 2, frequency.value
+    @sine = new Sine @audiolet, frequency
+    @modulator = new Saw @audiolet, 2 * frequency
+    @modulatorMulAdd = new MulAdd @audiolet, frequency / 2, frequency
     @gain = new Gain @audiolet
     @envelope = new PercussiveEnvelope @audiolet, 1, 0.2, 0.5,
       ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
@@ -14,65 +14,11 @@ class Synth extends AudioletGroup
     @sine.connect @gain
     @gain.connect @outputs[0]
 
-class Feedback extends AudioletGroup
-  constructor: (audiolet, frequency, feedback, mix) ->
-    super [audiolet, 0, 1]...
-    period = Math.floor @audiolet.device.sampleRate / frequency.value
-
-    @noise = new WhiteNoise @audiolet
-    @gain = new Gain @audiolet
-    @envelope = new PercussiveEnvelope @audiolet, 1, 0.2, 0.5,
-      ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
-    @feedbackDelay = new FeedbackDelay @audiolet, period, period, feedback.value, mix.value
-
-    @noise.connect @feedbackDelay
-    @feedbackDelay.connect @gain
-    @envelope.connect @gain, 0, 1
-    @gain.connect @outputs[0]
-
-class Fail extends AudioletGroup
-  constructor: (audiolet, frequency, feedback, mix) ->
-    super [audiolet, 0, 1]...
-    period = 1
-    console.log period, @audiolet.device.sampleRate, frequency.value
-
-    # Burst of white noise
-    @noise = new WhiteNoise @audiolet
-    @burst = new Gain @audiolet
-    @burstEnvelope = new PercussiveEnvelope @audiolet, 1, period, period,
-      ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
-
-    # Feedback delay
-    @delay = new Delay @audiolet, period, period
-    @lowPass = new LowPassFilter @audiolet, frequency
-    @mulAdd = new MulAdd @audiolet, 0.5, 0
-    # @mixer = new UpMixer @audiolet, 2
-
-    # Single tune
-    @gain = new Gain @audiolet
-    @gainEnvelope = new PercussiveEnvelope @audiolet, 1, 2, 5,
-      ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
-
-    # Connect nodes
-    @burstEnvelope.connect @burst, 0, 1
-    @gainEnvelope.connect @gain, 0, 1
-    @noise.connect @burst
-
-    @burst.connect @mulAdd, 0, 0
-    @lowPass.connect @mulAdd, 0, 2
-
-    @mulAdd.connect @delay
-    @mulAdd.connect @gain
-
-    @delay.connect @lowPass
-    @burst.connect @gain
-    @gain.connect @outputs[0]
-
 class KarplusStrong extends AudioletNode
-  constructor: (audiolet, frequency, feedback, mix) ->
+  constructor: (audiolet, frequency) ->
     super audiolet, 1, 1
     @linkNumberOfOutputChannels 0, 0
-    @period = Math.floor @audiolet.device.sampleRate / frequency.value
+    @period = Math.floor @audiolet.device.sampleRate / frequency
     @buffers = []
     @firstRun = true
     @index  = 0
@@ -105,21 +51,41 @@ class KarplusStrong extends AudioletNode
 
   toString: -> "Karplus-Strong"
 
-class Gitarr extends AudioletGroup
-  constructor: (audiolet, frequency, feedback, mix) ->
+class GitarrString extends AudioletGroup
+  constructor: (audiolet, frequency, mix, roomSize, damping) ->
     super [audiolet, 0, 1]...
 
-    @noise = new WhiteNoise @audiolet
+    @noise = [
+      new WhiteNoise @audiolet
+      new WhiteNoise @audiolet
+      new WhiteNoise @audiolet
+    ]
     @gain = new Gain @audiolet
     @envelope = new PercussiveEnvelope @audiolet, 1, 0.2, 0.5,
       ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
-    @karplus = new KarplusStrong @audiolet, frequency, feedback, mix
-    @mixer = new UpMixer @audiolet, 2
+    @effect = new Reverb @audiolet, mix, roomSize, damping
 
-    @noise.connect @karplus
-    @karplus.connect @gain
+    @main  = new KarplusStrong @audiolet, frequency
+    @above = new KarplusStrong @audiolet, frequency * 1.005
+    @below = new KarplusStrong @audiolet, frequency * 0.995
+
+    @addOther = new Add @audiolet
+    @addFinal = new Add @audiolet
+
+    @noise[0].connect @main
+    @noise[1].connect @above
+    @noise[2].connect @below
+
+    @above.connect @addOther, 0, 0
+    @below.connect @addOther, 0, 1
+
+    @main.connect @addFinal, 0, 0
+    @addOther.connect @addFinal, 0, 1
+
+    @addFinal.connect @gain
     @envelope.connect @gain, 0, 1
-    @gain.connect @outputs[0]
+    @gain.connect @effect
+    @effect.connect @outputs[0]
 
 class Range
   constructor: (id) ->
@@ -135,13 +101,16 @@ class Range
 
 $ ->
   frequency = new Range "frequency"
+  mix       = new Range "mix"
+  roomSize  = new Range "roomSize"
+  damping   = new Range "damping"
 
   audiolet  = new Audiolet
 
   $play = $("#play")
   $play.on "click", (event) ->
-    console.log frequency.value, feedback.value, mix.value
-    sound = new Gitarr audiolet, frequency, feedback, mix
+    console.log frequency.value, mix.value, roomSize.value, damping.value
+    sound = new GitarrString audiolet, frequency.value, mix.value, roomSize.value, damping.value
     sound.connect audiolet.output
     window.sound = sound
     return true

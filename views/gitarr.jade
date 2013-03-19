@@ -12,4 +12,7 @@ block content
   audio#gitarr
   form
     +range("Frekvens", "frequency", 200, 880, 10)
+    +range("Mix", "mix", 0, 1, 0.01)
+    +range("Room size", "roomSize", 0, 1, 0.01)
+    +range("Damping", "damping", 0, 1, 0.01)
     input(type="button", id="play", value="Spela")
