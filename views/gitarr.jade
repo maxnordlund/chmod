@@ -1,0 +1,15 @@
+extends layout
+
+append scripts
+  script(src="/javascript/gitarr.js")
+
+mixin range(label, name, min, max, step)
+  label(id="#{name}")= label
+    input(type="range", min="#{min}", max="#{max}", step="#{step}")
+    output
+
+block content
+  audio#gitarr
+  form
+    +range("Frekvens", "frequency", 200, 880, 10)
+    input(type="button", id="play", value="Spela")
