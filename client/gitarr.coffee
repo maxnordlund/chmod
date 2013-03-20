@@ -57,7 +57,7 @@ class GitarrString extends AudioletGroup
 
     @noise = new WhiteNoise @audiolet
     @gain = new Gain @audiolet
-    @envelope = new PercussiveEnvelope @audiolet, 0, 0.2, 0.5,
+    @envelope = new PercussiveEnvelope @audiolet, 0, 0.5, 3,
       ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
 
     @main  = new KarplusStrong @audiolet, frequency
@@ -66,6 +66,7 @@ class GitarrString extends AudioletGroup
     @main.connect @gain
     @envelope.connect @gain, 0, 1
     @gain.connect @outputs[0]
+    # @main.connect @outputs[0]
 
 class Range
   constructor: (id) ->
@@ -84,21 +85,26 @@ note = (n) -> 440 * Math.pow 2, (n - 49) / 12
 
 $ ->
   frequency = new Range "frequency"
-  mix       = new Range "mix"
-  roomSize  = new Range "roomSize"
-  damping   = new Range "damping"
+  window.tunes = []
+  for i in [0..5]
+    tunes.push new Range "tune_#{i}"
 
   $play = $("#play")
   $play.on "click", (event) ->
-    window.notes = [40, 42, 44, 45, 47, 49].map note
-    window.note  = note
-    # frequencyPattern = new PSequence notes, Infinity
-    frequencyPattern = new PChoose notes, Infinity
-    window.pattern = frequencyPattern
     audiolet = new Audiolet
-    total = 0
-    audiolet.scheduler.play [frequencyPattern], 1, (tune) ->
-      console.log ++total
-      string = new GitarrString audiolet, tune
-      string.connect audiolet.output
+    # window.notes = [40, 42, 44, 45, 47, 49].map note
+    # window.note  = note
+    # frequencyPattern = new PSequence notes, Infinity
+    # frequencyPattern = new PChoose notes, Infinity
+    # window.pattern = frequencyPattern
+    # total = 0
+    window.notes = tunes.map (tune) -> note tune.value
+    # frequencyPattern = new PSequence notes, 1
+    # durationPattern  = new PChoose [0.1, 0.15, 0.2, 0.25], 1
+    # audiolet.scheduler.play [frequencyPattern], 0.01, (tune) ->
+    #   # console.log ++total
+    #   string = new GitarrString audiolet, tune
+    #   string.connect audiolet.output
+    string = new GitarrString audiolet, notes[0]
+    string.connect audiolet.output
     return true
