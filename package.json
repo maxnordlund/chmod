@@ -1,6 +1,6 @@
 {
   "name": "Sound",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "main": "run",
   "author": "Chmod (speech.kth.se)",
@@ -17,7 +17,6 @@
     "connect": "2.7.x",
     "express": "3.1.x",
     "express-jquery": "1.8.x",
-    "fibrous": "0.3.x",
     "bash-color": "0.0.x"
   },
   "devDependencies": {

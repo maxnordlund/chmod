@@ -1,5 +1,4 @@
 express = require "express"
-fibrous = require "fibrous"
 color   = require "bash-color"
 
 # Setup server
@@ -15,7 +14,6 @@ app.configure ->
 
   # Set up middleware
   app.use require("express-jquery") "/javascript/jquery.js"
-  app.use fibrous.middleware
 
   # Set up routes
   app.get "/", (req, res) ->
