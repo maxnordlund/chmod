@@ -12,7 +12,8 @@ block content
   audio#gitarr
   form
     +range("Frekvens", "frequency", 200, 880, 10)
-    +range("Mix", "mix", 0, 1, 0.01)
-    +range("Room size", "roomSize", 0, 1, 0.01)
-    +range("Damping", "damping", 0, 1, 0.01)
+    - for (var i = 0; i < 6; ++i)
+      - var name = "Ton " + i
+      - var id   = "tune_" + i
+      +range(name, id, 1, 88, 1)
     input(type="button", id="play", value="Spela")
