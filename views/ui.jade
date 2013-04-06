@@ -1,32 +1,33 @@
 extends layout
 
 append styles
-	link(rel="stylesheet", href="/style/ui.css")
+  link(rel="stylesheet", href="/style/ui.css")
 
 block content
-	h1
-		ChMod
-	
-	.row
-		button#recordButton
-			svg.svgicon(xmlns="http://www.w3.org/2000/svg")
-				circle#record(cx="25", cy="25", r="20")
-				
-		button#playButton
-			svg.svgicon(xmlns="http://www.w3.org/2000/svg")
-				circle#head(cx="25", cy="20", r="10")
-				path#shoulders(d="M10,50 C2.5,25 47.5,25 40,50")
-				polygon.play(points="30,35 30,50 45,42")
-			
-		button#compPlayButton
-			svg.svgicon(xmlns="http://www.w3.org/2000/svg")
-				rect#screen(x=7, y=2, width="36", height="25")
-			
-	ul
-		li
-			button
-				img(src="assets/images/ord/kung_thumb.GIF", alt="Kung")
-			button
-				img(src="assets/images/ord/kam_thumb.GIF", alt="Kam")
-	
-	
+  h1
+    ChMod
+
+  .row
+    button#recordButton
+      svg.svgicon(xmlns="http://www.w3.org/2000/svg")
+        circle#record(cx="25", cy="25", r="20")
+
+    button#playButton
+      svg.svgicon(xmlns="http://www.w3.org/2000/svg")
+        circle#head(cx="25", cy="20", r="10")
+        path#shoulders(d="M10,50 C2.5,25 47.5,25 40,50")
+        polygon.play(points="30,35 30,50 45,42")
+
+    button#compPlayButton
+      svg.svgicon(xmlns="http://www.w3.org/2000/svg")
+        rect#screen(x="7", y="2", width="36", height="25")
+        rect#keyboard(x="2", y="25", width="40", height="30")
+
+  ul
+    li
+      button
+        img(src="assets/images/ord/kung_thumb.GIF", alt="Kung")
+      button
+        img(src="assets/images/ord/kam_thumb.GIF", alt="Kam")
+
+
