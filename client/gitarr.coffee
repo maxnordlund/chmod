@@ -99,12 +99,12 @@ $ ->
     # window.pattern = frequencyPattern
     # total = 0
     window.notes = tunes.map (tune) -> note tune.value
-    # frequencyPattern = new PSequence notes, 1
-    # durationPattern  = new PChoose [0.1, 0.15, 0.2, 0.25], 1
-    # audiolet.scheduler.play [frequencyPattern], 0.01, (tune) ->
-    #   # console.log ++total
-    #   string = new GitarrString audiolet, tune
-    #   string.connect audiolet.output
-    string = new GitarrString audiolet, notes[0]
-    string.connect audiolet.output
+    frequencyPattern = new PSequence notes, 1
+    durationPattern  = new PChoose [0.1, 0.15, 0.2, 0.25], 1
+    audiolet.scheduler.play [frequencyPattern], 0.01, (tune) ->
+      # console.log ++total
+      string = new GitarrString audiolet, tune
+      string.connect audiolet.output
+    # string = new GitarrString audiolet, notes[0]
+    # string.connect audiolet.output
     return true
