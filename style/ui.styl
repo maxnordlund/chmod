@@ -2,8 +2,8 @@
 
 body
   background-color #DDD
-  
-  
+
+
 //-----------------------\\
 //   Menu definitions    \\
 //-----------------------\\
@@ -14,20 +14,20 @@ body
   color #DDD
   list-style-type none
   text-align center
-  
+
   a
   a:hover
   a:visited
     color #DDD
-  
+
 //-----------------------\\
 // SVG style definitions \\
 //-----------------------\\
 
-.svgicon
+.icon
   height 50px
   width 50px
-  perspective 500px
+  perspective 10px
 
 .play
   fill lime
@@ -45,11 +45,33 @@ body
 #shoulders
   fill black
 
+#compPlayButton
+  height 50px
+  width 50px
+  perspective 100px
+
+#play
+  position absolute
+  z-index 1
+
 #screen
-  fill white
-  stroke silver
-  stroke-width 3px
+  transform translateZ(-24px)
+  rect
+    fill white
+    stroke silver
+    stroke-width 3px
 
 #keyboard
+  height 30px
+  width 50px
+  transform rotateX(60deg) translateY(-24px)
+  g rect
+    fill black
+
+#plate
   fill silver
-  transform rotateX(50deg)
+
+#pad
+  fill gray
+
+
