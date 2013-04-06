@@ -23,6 +23,9 @@ app.configure ->
   app.get "/gitarr", (req, res) ->
     # res.set "Content-Type": "application/xhtml+xml; charset=utf-8"
     res.render "gitarr", require "./views/gitarr.json"
+    
+  app.get "/ui", (req, res) ->
+    res.render "ui", require ".views/ui.json"
 
 app.configure "production", ->
   app.get "/javascript/Audiolet.js", (req, res) ->
