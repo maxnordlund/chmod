@@ -1,0 +1,9 @@
+extends layout
+
+append scripts
+	script(src="/javascript/plot.js")
+  
+block content
+	audio#testSound
+		canvas#canvas
+		button(id="play", value="Spela")
