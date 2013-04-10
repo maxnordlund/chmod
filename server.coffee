@@ -16,16 +16,17 @@ app.configure ->
   app.use require("express-jquery") "/javascript/jquery.js"
 
   # Set up routes
+  get = (routes...) ->
+    routes.forEach (route) ->
+      app.get "/#{route}", (req, res) ->
+        # res.set "Content-Type": "application/xhtml+xml; charset=utf-8"
+        res.render route, require "./views/#{route}.json"
+
+  get "gitarr", "splice", "ui"
+
   app.get "/", (req, res) ->
     # res.set "Content-Type": "application/xhtml+xml; charset=utf-8"
     res.render "index", require "./views/index.json"
-
-  app.get "/gitarr", (req, res) ->
-    # res.set "Content-Type": "application/xhtml+xml; charset=utf-8"
-    res.render "gitarr", require "./views/gitarr.json"
-
-  app.get "/ui", (req, res) ->
-    res.render "ui", require "./views/ui.json"
 
   app.get "/ui/laptop.svg", (req, res) ->
     res.set "Content-Type": "image/svg+xml; charset=utf-8"
