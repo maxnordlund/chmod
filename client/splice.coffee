@@ -7,14 +7,16 @@ class Range
 
   change: (event) =>
     @value = parseFloat do @input.val
-    @output.text "#{Math.floor(@value / 60)}:#{@value % 60}"
+    @output.text "#{Math.floor(@value / 60)}:#{(@value % 60).toFixed 1}"
     return true
+
+  max: (value) -> @input.attr "max", value
 
 class Switch extends AudioletNode
   constructor: (audiolet, time) ->
     super audiolet, 0, 1
     @linkNumberOfOutputChannels 0, 0
-    @length = Math.floor @audiolet.device.sampleRate * time
+    @length = Math.floor audiolet.device.sampleRate * time
     @index  = 0
 
   generate: (inputBuffers, outputBuffers) ->
@@ -40,9 +42,9 @@ class Splice extends AudioletGroup
     @cross  = new CrossFade audiolet, 0
 
     @switch.connect @delay
-    @first.connect  @cross 0, 0
-    @second.connect @cross 0, 1
-    @delay.connect  @cross 0, 2
+    @first.connect  @cross, 0, 0
+    @second.connect @cross, 0, 1
+    @delay.connect  @cross, 0, 2
     @cross.connect  @outputs[0]
 
 $ ->
@@ -57,10 +59,11 @@ $ ->
     return deferred
 
   $play.attr "disabled", "disabled"
-  $.when(load("first"), load("second")).done (first, second) ->
+  $.when(load("Song_of_Storms"), load("Song_of_Time")).done (first, second) ->
+    audiolet = new Audiolet
+    time.max Math.min(first.length, second.length) / audiolet.device.sampleRate
     $play.removeAttr "disabled"
     $play.on "click", (event) ->
-      audiolet = new Audiolet
-      splice   = new Splice first, second, time.value
-      splcie.connect audiolet.output
+      splice   = new Splice audiolet, first, second, time.value
+      splice.connect audiolet.output
       return true
