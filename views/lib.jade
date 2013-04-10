@@ -1,11 +1,4 @@
-mixin headers(headers, list)
-  thead
-    tr
-      for header in headers
-        th= header
-      th: button(ng:click="add(#{list})") Add
-  tfoot
-    tr
-      for header in headers
-        th= header
-      th: button(ng:click="add(#{list})") Add
+mixin range(label, name, min, max, step)
+  label(id="#{name}")= label
+    input(type="range", min="#{min}", max="#{max}", step="#{step}")
+    output
