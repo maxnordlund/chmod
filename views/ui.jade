@@ -1,0 +1,47 @@
+extends layout
+
+append styles
+  link(rel="stylesheet", href="/style/ui.css")
+
+block content
+  header
+    ul#menu
+      li
+        a(href="/ui#k").
+          Dentaliserar
+          
+      li
+        a(href="/ui#t").
+          !Dentaliserar
+      
+  .row
+    #recordButton.icon
+      svg(xmlns="http://www.w3.org/2000/svg")
+        circle#record(cx="25", cy="25", r="20")
+
+    #playButton.icon
+      svg(xmlns="http://www.w3.org/2000/svg")
+        circle#head(cx="25", cy="20", r="10")
+        path#shoulders(d="M10,50 C2.5,25 47.5,25 40,50")
+        polygon.play(points="30,30 30,45 45,37")
+
+    #compPlayButton.icon
+      svg#play(xmlns="http://www.w3.org/2000/svg")
+        polygon.play(points="30,30 30,45 45,37")
+      svg#screen(xmlns="http://www.w3.org/2000/svg", width="50", height="30")
+        rect(x="3", y="3", width="44", height="24")
+      svg#keyboard(xmlns="http://www.w3.org/2000/svg")
+        rect#plate(x="0", y="0", width="50", height="30")
+        g
+          - for(var y = 3; y < 14; y += 4)
+            - for(var x = 3; x < 45; x += 4)
+              rect(x=x, y=y, width="3", height="3")
+        rect#pad(x="18", y="18", width="14", height="8")
+  ul
+    li
+      button
+        img(src="assets/images/ord/kung_thumb.GIF", alt="Kung")
+      button
+        img(src="assets/images/ord/kam_thumb.GIF", alt="Kam")
+
+
