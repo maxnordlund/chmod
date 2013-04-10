@@ -1,6 +1,6 @@
 class Synth extends AudioletGroup
   constructor: (audiolet, frequency) ->
-    super [audiolet, 0, 1]...
+    super audiolet, 0, 1
     @sine = new Sine @audiolet, frequency
     @modulator = new Saw @audiolet, 2 * frequency
     @modulatorMulAdd = new MulAdd @audiolet, frequency / 2, frequency
@@ -52,40 +52,21 @@ class KarplusStrong extends AudioletNode
   toString: -> "Karplus-Strong"
 
 class GitarrString extends AudioletGroup
-  constructor: (audiolet, frequency, mix, roomSize, damping) ->
-    super [audiolet, 0, 1]...
+  constructor: (audiolet, frequency) ->
+    super audiolet, 0, 1
 
-    @noise = [
-      new WhiteNoise @audiolet
-      new WhiteNoise @audiolet
-      new WhiteNoise @audiolet
-    ]
+    @noise = new WhiteNoise @audiolet
     @gain = new Gain @audiolet
-    @envelope = new PercussiveEnvelope @audiolet, 1, 0.2, 0.5,
+    @envelope = new PercussiveEnvelope @audiolet, 0, 0.5, 3,
       ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
-    @effect = new Reverb @audiolet, mix, roomSize, damping
 
     @main  = new KarplusStrong @audiolet, frequency
-    @above = new KarplusStrong @audiolet, frequency * 1.005
-    @below = new KarplusStrong @audiolet, frequency * 0.995
+    @noise.connect @main
 
-    @addOther = new Add @audiolet
-    @addFinal = new Add @audiolet
-
-    @noise[0].connect @main
-    @noise[1].connect @above
-    @noise[2].connect @below
-
-    @above.connect @addOther, 0, 0
-    @below.connect @addOther, 0, 1
-
-    @main.connect @addFinal, 0, 0
-    @addOther.connect @addFinal, 0, 1
-
-    @addFinal.connect @gain
+    @main.connect @gain
     @envelope.connect @gain, 0, 1
-    @gain.connect @effect
-    @effect.connect @outputs[0]
+    @gain.connect @outputs[0]
+    # @main.connect @outputs[0]
 
 class Range
   constructor: (id) ->
@@ -99,18 +80,31 @@ class Range
     @output.text @value
     return true
 
+# See http://en.wikipedia.org/wiki/Piano_key_frequencies
+note = (n) -> 440 * Math.pow 2, (n - 49) / 12
+
 $ ->
   frequency = new Range "frequency"
-  mix       = new Range "mix"
-  roomSize  = new Range "roomSize"
-  damping   = new Range "damping"
-
-  audiolet  = new Audiolet
+  window.tunes = []
+  for i in [0..5]
+    tunes.push new Range "tune_#{i}"
 
   $play = $("#play")
   $play.on "click", (event) ->
-    console.log frequency.value, mix.value, roomSize.value, damping.value
-    sound = new GitarrString audiolet, frequency.value, mix.value, roomSize.value, damping.value
-    sound.connect audiolet.output
-    window.sound = sound
+    audiolet = new Audiolet
+    # window.notes = [40, 42, 44, 45, 47, 49].map note
+    # window.note  = note
+    # frequencyPattern = new PSequence notes, Infinity
+    # frequencyPattern = new PChoose notes, Infinity
+    # window.pattern = frequencyPattern
+    # total = 0
+    window.notes = tunes.map (tune) -> note tune.value
+    frequencyPattern = new PSequence notes, 1
+    durationPattern  = new PChoose [0.1, 0.15, 0.2, 0.25], 1
+    audiolet.scheduler.play [frequencyPattern], 0.01, (tune) ->
+      # console.log ++total
+      string = new GitarrString audiolet, tune
+      string.connect audiolet.output
+    # string = new GitarrString audiolet, notes[0]
+    # string.connect audiolet.output
     return true
