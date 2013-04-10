@@ -24,6 +24,13 @@ app.configure ->
     # res.set "Content-Type": "application/xhtml+xml; charset=utf-8"
     res.render "gitarr", require "./views/gitarr.json"
 
+  app.get "/ui", (req, res) ->
+    res.render "ui", require "./views/ui.json"
+
+  app.get "/ui/laptop.svg", (req, res) ->
+    res.set "Content-Type": "image/svg+xml; charset=utf-8"
+    res.render "laptop", require "./views/laptop.json"
+
 app.configure "production", ->
   app.get "/javascript/Audiolet.js", (req, res) ->
     res.sendfile "./Audiolet/src/audiolet/Audiolet.min.js"
