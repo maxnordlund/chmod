@@ -71,15 +71,27 @@ $ ->
   load = (path) ->
     deferred = new $.Deferred
     buffer   = new AudioletBuffer 1, 0
-    buffer.load "/audio/#{path}.wav", true, ->
+    request  = new AudioFileRequest "/audio/#{path}.wav", true
+    request.onSuccess = (decoded) ->
+      buffer.length = decoded.length
+      buffer.numberOfChannels = decoded.channels.length
+      buffer.unslicedChannels = decoded.channels
+      buffer.channels = decoded.channels
+      buffer.channelOffset = 0
+      buffer.sampleRate = decoded.sampleRate
       deferred.resolve buffer
+
+    request.onFailure = ->
+      deferred.reject "Could not load", path
+
+    do request.send
     return deferred
 
   $play.attr "disabled", "disabled"
   $.when(load("Song_of_Storms"), load("Song_of_Time")).done (first, second) ->
     audiolet = new Audiolet
-    stop.max first.length / audiolet.device.sampleRate
-    start.max second.length / audiolet.device.sampleRate
+    stop.max first.length / first.sampleRate
+    start.max second.length / second.sampleRate
     $play.removeAttr "disabled"
     $play.on "click", (event) ->
       splice = new Splice audiolet, first, second, stop.value, start.value
