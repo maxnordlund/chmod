@@ -31,7 +31,7 @@ class Switch extends AudioletNode
 
   toString: -> "Switch"
 
-class Splice extends AudioletGroup
+class Fade extends AudioletGroup
   constructor: (audiolet, first, second, time) ->
     super audiolet, 0, 1
 
@@ -47,8 +47,24 @@ class Splice extends AudioletGroup
     @delay.connect  @cross, 0, 2
     @cross.connect  @outputs[0]
 
+class Splice extends AudioletGroup
+  constructor: (audiolet, first, second, stop, start) ->
+    super audiolet, 0, 1
+
+    to   = Math.floor audiolet.device.sampleRate * stop
+    from = Math.floor audiolet.device.sampleRate * start
+
+    @buffer = new AudioletBuffer first.numberOfChannels, to + second.length - from
+    @buffer.setSection first, to, 0, 0
+    @buffer.setSection second, second.length - from, from, to
+    @player = new BufferPlayer audiolet, @buffer
+
+    @player.connect @outputs[0]
+
+
 $ ->
-  time  = new Range "time"
+  stop  = new Range "stop"
+  start = new Range "start"
   $play = $("#play")
 
   load = (path) ->
@@ -61,9 +77,10 @@ $ ->
   $play.attr "disabled", "disabled"
   $.when(load("Song_of_Storms"), load("Song_of_Time")).done (first, second) ->
     audiolet = new Audiolet
-    time.max Math.min(first.length, second.length) / audiolet.device.sampleRate
+    stop.max first.length / audiolet.device.sampleRate
+    start.max second.length / audiolet.device.sampleRate
     $play.removeAttr "disabled"
     $play.on "click", (event) ->
-      splice   = new Splice audiolet, first, second, time.value
+      splice = new Splice audiolet, first, second, stop.value, start.value
       splice.connect audiolet.output
       return true
