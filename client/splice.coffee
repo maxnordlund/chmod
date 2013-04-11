@@ -7,7 +7,7 @@ class Range
 
   change: (event) =>
     @value = parseFloat do @input.val
-    @output.text "#{Math.floor(@value / 60)}:#{(@value % 60).toFixed 1}"
+    @output.text "#{Math.floor(@value / 60)}:#{(@value % 60).toFixed 2}"
     return true
 
   max: (value) -> @input.attr "max", value
@@ -53,13 +53,13 @@ class Splice extends AudioletGroup
   constructor: (audiolet, first, second, stop, start) ->
     super audiolet, 0, 1
 
-    to   = Math.floor audiolet.device.sampleRate * stop
-    from = Math.floor audiolet.device.sampleRate * start
+    to   = Math.floor first.sampleRate * stop
+    from = Math.floor second.sampleRate * start
 
     @buffer = new AudioletBuffer first.numberOfChannels, to + second.length - from
     @buffer.setSection first, to, 0, 0
     @buffer.setSection second, second.length - from, from, to
-    @player = new BufferPlayer audiolet, @buffer
+    @player = new BufferPlayer audiolet, @buffer, first.sampleRate / audiolet.device.sampleRate
 
     @player.connect @outputs[0]
 
@@ -88,7 +88,8 @@ $ ->
     return deferred
 
   $play.attr "disabled", "disabled"
-  $.when(load("Song_of_Storms"), load("Song_of_Time")).done (first, second) ->
+  # $.when(load("Song_of_Storms"), load("Song_of_Time")).done (first, second) ->
+  $.when(load("karta"), load("kaka")).done (first, second) ->
     audiolet = new Audiolet
     stop.max first.length / first.sampleRate
     start.max second.length / second.sampleRate
