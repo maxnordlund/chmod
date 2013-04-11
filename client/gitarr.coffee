@@ -66,7 +66,6 @@ class GitarrString extends AudioletGroup
     @main.connect @gain
     @envelope.connect @gain, 0, 1
     @gain.connect @outputs[0]
-    # @main.connect @outputs[0]
 
 class Range
   constructor: (id) ->
@@ -92,19 +91,10 @@ $ ->
   $play = $("#play")
   $play.on "click", (event) ->
     audiolet = new Audiolet
-    # window.notes = [40, 42, 44, 45, 47, 49].map note
-    # window.note  = note
-    # frequencyPattern = new PSequence notes, Infinity
-    # frequencyPattern = new PChoose notes, Infinity
-    # window.pattern = frequencyPattern
-    # total = 0
     window.notes = tunes.map (tune) -> note tune.value
     frequencyPattern = new PSequence notes, 1
     durationPattern  = new PChoose [0.1, 0.15, 0.2, 0.25], 1
     audiolet.scheduler.play [frequencyPattern], 0.01, (tune) ->
-      # console.log ++total
       string = new GitarrString audiolet, tune
       string.connect audiolet.output
-    # string = new GitarrString audiolet, notes[0]
-    # string.connect audiolet.output
     return true
