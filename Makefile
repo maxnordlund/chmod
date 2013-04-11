@@ -23,12 +23,14 @@ html  := $(wildcard views/*.jade)
 html  := $(filter-out views/lib.jade,$(html))
 html  := $(filter-out views/layout.jade,$(html))
 html  := $(html:views/%.jade=public/xhtml/%.html)
-wav   := $(wildcard audio/*.mp3)
-wav   := $(wav:audio/%.mp3=public/audio/%.wav)
+mp3   := $(wildcard audio/*.mp3)
+mp3   := $(mp3:audio/%.mp3=public/audio/%.wav)
+wav   := $(wildcard audio/*.wav)
+wav   := $(wav:audio/%.wav=public/audio/%.wav)
 
 .PHONY: clean dist run
 
-all: node_modules $(js) $(css) $(html) $(wav)
+all: node_modules $(js) $(css) $(html) $(mp3) $(wav)
 
 run: all
 	@coffee server.coffee
@@ -102,4 +104,8 @@ public/xhtml/%.html: views/%.jade public/xhtml
 
 public/audio/%.wav: audio/%.mp3 public/audio
 	@lame --quiet --decode $< $@ 1> /dev/null
+	$(call done,$<,$@)
+
+public/audio/%.wav: audio/%.wav public/audio
+	@cp $< $@ 1> /dev/null
 	$(call done,$<,$@)
