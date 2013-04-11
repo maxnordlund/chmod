@@ -8,26 +8,55 @@ body
 //   Menu definitions    \\
 //-----------------------\\
 
-#menu
-  display: inline-block;
+nav
   background-color #333
   color #DDD
   list-style-type none
-  text-align center
+  margin 0px -10px 10px 
+  
+  a:hover
+    background-color #555
 
   a
-  a:hover
   a:visited
+    padding 15px 20px 15px -10px
+    text-align center
+    margin 5px
+    display inline-block
+    height 20px
     color #DDD
+    text-decoration none
+    
+#ordlist
+  li
+    height 20px
+    display inline-block
+    text-align center
+    
+    button
+      color transparent
+      width 52px
+      height 44px
+      margin 10px
+        
+article
+  width 500px
+  margin 0 auto
+  
 
 //-----------------------\\
 // SVG style definitions \\
 //-----------------------\\
 
-.icon
-  height 50px
-  width 50px
-  //perspective 10px
+#controller
+  div
+    margin 0
+  button
+    padding 0
+    height 60px
+    width 60px
+    #compPlayButton
+      margin -0px 0px
 
 .play
   fill lime

@@ -1,3 +1,27 @@
 {
-  "title": "ChMoD"
+  "title": "ChMoD",
+  "k_words": [
+    "Ko",
+    "Kopp",
+    "Korg",
+    "Kulle",
+    "Kam",
+    "Karta",
+    "Katt",
+    "Kavel",
+    "Kung"
+   ],
+  "t_words": [
+    "Tag",
+    "Tak",
+    "Tant",
+    "Tavla",
+    "Tidning",
+    "Tiger",
+    "Tomte",
+    "Topp",
+    "Tumme",
+    "Tunga",
+    "Tupp"
+  ]
 }
