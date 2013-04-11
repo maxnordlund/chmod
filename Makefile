@@ -13,22 +13,22 @@ endef
 
 jsPath := public/javascript
 
-js     := $(wildcard client/*.coffee)
-js     := $(js:client/%.coffee=$(jsPath)/%.js)
-# js     := $(js) $(jsPath)/angular.js $(jsPath)/angular-ui.js $(jsPath)/select2.js
-css    := $(wildcard style/*.styl)
-# css    := $(css) public/style/select2.css
-css    := $(css:style/%.styl=public/style/%.css)
-html   := $(wildcard views/*.jade)
-html   := $(filter-out views/lib.jade,$(html))
-html   := $(filter-out views/layout.jade,$(html))
-html   := $(html:views/%.jade=public/xhtml/%.html)
-audio  := $(wildcard audio/*.wav)
-audio  := $(audio:audio/%.wav=public/audio/%.wav)
+js    := $(wildcard client/*.coffee)
+js    := $(js:client/%.coffee=$(jsPath)/%.js)
+# js    := $(js) $(jsPath)/angular.js $(jsPath)/angular-ui.js $(jsPath)/select2.js
+css   := $(wildcard style/*.styl)
+# css   := $(css) public/style/select2.css
+css   := $(css:style/%.styl=public/style/%.css)
+html  := $(wildcard views/*.jade)
+html  := $(filter-out views/lib.jade,$(html))
+html  := $(filter-out views/layout.jade,$(html))
+html  := $(html:views/%.jade=public/xhtml/%.html)
+wav   := $(wildcard audio/*.mp3)
+wav   := $(wav:audio/%.mp3=public/audio/%.wav)
 
 .PHONY: clean dist run
 
-all: node_modules $(js) $(css) $(html) $(audio)
+all: node_modules $(js) $(css) $(html) $(wav)
 
 run: all
 	@coffee server.coffee
@@ -100,6 +100,6 @@ public/xhtml/%.html: views/%.jade public/xhtml
 	@jade -P -O public/xhtml -p views/ -o views/$*.json $< 1> /dev/null
 	$(call done,$<,$@)
 
-public/audio/%.wav: audio/%.wav public/audio
+public/audio/%.wav: audio/%.mp3 public/audio
 	@lame --quiet --decode $< $@ 1> /dev/null
 	$(call done,$<,$@)
