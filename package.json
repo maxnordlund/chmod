@@ -9,7 +9,7 @@
     "Johan Fogelström <johfog@kth.se>"
   ],
   "dependencies": {
-    "coffee-script": "1.4.x",
+    "coffee-script": "1.6.x",
     "jade": "0.28.x",
     "marked": "0.2.x",
     "stylus": "0.32.x",
@@ -17,7 +17,8 @@
     "connect": "2.7.x",
     "express": "3.1.x",
     "express-jquery": "1.8.x",
-    "bash-color": "0.0.x"
+    "bash-color": "0.0.x",
+    "async": "0.2.x"
   },
   "devDependencies": {
     "nodemon": "0.7.x",
