@@ -13,13 +13,13 @@ block content
       button
         #recordButton
           svg(xmlns="http://www.w3.org/2000/svg")
-            circle#record(cx="25", cy="25", r="20")
+            circle#record(cx="25", cy="25", r="22")
             
       button
         #playButton
           svg(xmlns="http://www.w3.org/2000/svg")
-            circle#head(cx="25", cy="20", r="10")
-            path#shoulders(d="M10,50 C2.5,25 47.5,25 40,50")
+            circle#head(cx="25", cy="14", r="10")
+            path#shoulders(d="M10,47 C0.5,18 49.5,18 40,47")
             polygon.play(points="30,30 30,45 45,37")
 
       button
@@ -32,25 +32,19 @@ block content
             - var keyboard_height = width - height - y
            
             rect#screen(x="#{x}", y="#{y}", width="#{width-2*x}", height="#{height-2*y}")
+            polygon#plate(points="#{x-1},#{height-2*y} #{width-x+1},#{height-2*y} #{width-x+5},#{height+keyboard_height} #{x-5},#{height+keyboard_height}")
+            g
+            - for(var y = 30; y < 36; y += 3)
+              - for(var x = 14; x < 34; x += 2)
+                polygon(transform="skewX(#{x-24})",points="#{x},#{y} #{x+2},#{y} #{x+2},#{y+2} #{x},#{y+2}")
+            - for(var x = 14; x < 20; x += 2)
+               polygon(transform="skewX(#{x-24})",points="#{x},36 #{x+2},36 #{x+2},38 #{x},38")
+            polygon(points="18,36 30,36 30,38 18,38")
+            rect#pad(x="18", y="39", width="14", height="6")
             polygon.play(points="30,30 30,45 45,37")
-            polygon(points="#{x},#{height-2*y} #{width-x},#{height-2*y} #{width-x+4},#{height+keyboard_height} #{x-4},#{height+keyboard_height}")
-
             
-//-          svg#play(xmlns="http://www.w3.org/2000/svg")
-//-            polygon.play(points="30,30 30,45 45,37")
-//-          svg#screen(xmlns="http://www.w3.org/2000/svg", width="50", height="30")
-//-            rect(x="3", y="3", width="44", height="24")
-//-          svg#keyboard(xmlns="http://www.w3.org/2000/svg")
-//-            rect#plate(x="0", y="0", width="50", height="30")
-//-            g
-//-              - for(var y = 3; y < 14; y += 4)
-//-                - for(var x = 3; x < 45; x += 4)
-//-                  rect(x=x, y=y, width="3", height="3")
-//-            rect#pad(x="18", y="18", width="14", height="8")
-            
-    #ordlist
-      ul
-        for word in k_words
-          li: button(style='background-image: url("/images/#{word.toLowerCase()}_thumb.GIF")')= word
+    section#ordlist
+      for word in t_words
+          button(style='background-image: url("/images/#{word.toLowerCase()}_thumb.GIF")')= word
 
 
