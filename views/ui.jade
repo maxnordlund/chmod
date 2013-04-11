@@ -24,20 +24,33 @@ block content
 
       button
         #compPlayButton
-          svg#play(xmlns="http://www.w3.org/2000/svg")
+          svg(xmlns="http://www.w3.org/2000/svg")
+            - var x = 7
+            - var y = 3
+            - var width = 50
+            - var height = 30
+            - var keyboard_height = width - height - y
+           
+            rect#screen(x="#{x}", y="#{y}", width="#{width-2*x}", height="#{height-2*y}")
             polygon.play(points="30,30 30,45 45,37")
-          svg#screen(xmlns="http://www.w3.org/2000/svg", width="50", height="30")
-            rect(x="3", y="3", width="44", height="24")
-          svg#keyboard(xmlns="http://www.w3.org/2000/svg")
-            rect#plate(x="0", y="0", width="50", height="30")
-            g
-              - for(var y = 3; y < 14; y += 4)
-                - for(var x = 3; x < 45; x += 4)
-                  rect(x=x, y=y, width="3", height="3")
-            rect#pad(x="18", y="18", width="14", height="8")
-          
-    ul#ordlist
-      for word in k_words
-        li: button(style='background-image: url("/images/#{word.toLowerCase()}_thumb.GIF")')= word
+            polygon(points="#{x},#{height-2*y} #{width-x},#{height-2*y} #{width-x+4},#{height+keyboard_height} #{x-4},#{height+keyboard_height}")
+
+            
+//-          svg#play(xmlns="http://www.w3.org/2000/svg")
+//-            polygon.play(points="30,30 30,45 45,37")
+//-          svg#screen(xmlns="http://www.w3.org/2000/svg", width="50", height="30")
+//-            rect(x="3", y="3", width="44", height="24")
+//-          svg#keyboard(xmlns="http://www.w3.org/2000/svg")
+//-            rect#plate(x="0", y="0", width="50", height="30")
+//-            g
+//-              - for(var y = 3; y < 14; y += 4)
+//-                - for(var x = 3; x < 45; x += 4)
+//-                  rect(x=x, y=y, width="3", height="3")
+//-            rect#pad(x="18", y="18", width="14", height="8")
+            
+    #ordlist
+      ul
+        for word in k_words
+          li: button(style='background-image: url("/images/#{word.toLowerCase()}_thumb.GIF")')= word
 
 
