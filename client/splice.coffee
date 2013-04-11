@@ -32,12 +32,14 @@ class Switch extends AudioletNode
   toString: -> "Switch"
 
 class Fade extends AudioletGroup
+  FADE_TIME = 1.0
+
   constructor: (audiolet, first, second, time) ->
     super audiolet, 0, 1
 
     @first  = new BufferPlayer audiolet, first
     @second = new BufferPlayer audiolet, second
-    @switch = new Switch audiolet, 1.0
+    @switch = new Switch audiolet, FADE_TIME
     @delay  = new Delay audiolet, time, time
     @cross  = new CrossFade audiolet, 0
 

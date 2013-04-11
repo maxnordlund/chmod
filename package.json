@@ -27,8 +27,8 @@
   "scripts": {
     "preinstall": "./preinstall.sh",
     "postinstall": "./postinstall.sh",
-    "prestart": ". shim.sh enable",
+    "prestart": ". shim.sh --enable",
     "start": "nodemon -e '.coffee|.styl|.jade' -x 'make'",
-    "poststart": ". shim.sh disable"
+    "poststart": ". shim.sh --disable"
   }
 }
