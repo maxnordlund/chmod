@@ -1,5 +1,7 @@
 express = require "express"
 color   = require "bash-color"
+async   = require "async"
+fs      = require "fs"
 
 # Setup server
 app = do express
@@ -16,33 +18,43 @@ app.configure ->
   app.use require("express-jquery") "/javascript/jquery.js"
 
   # Set up routes
+  get = (routes...) ->
+    routes.forEach (route) ->
+      app.get "/#{route}", (req, res) ->
+        # res.set "Content-Type": "application/xhtml+xml; charset=utf-8"
+        res.render route, require "./views/#{route}.json"
+
+  get "gitarr", "splice", "ui"
+
   app.get "/", (req, res) ->
     # res.set "Content-Type": "application/xhtml+xml; charset=utf-8"
     res.render "index", require "./views/index.json"
-
-  app.get "/gitarr", (req, res) ->
-    # res.set "Content-Type": "application/xhtml+xml; charset=utf-8"
-    res.render "gitarr", require "./views/gitarr.json"
-
-  app.get "/ui", (req, res) ->
-    res.render "ui", require "./views/ui.json"
 
   app.get "/ui/laptop.svg", (req, res) ->
     res.set "Content-Type": "image/svg+xml; charset=utf-8"
     res.render "laptop", require "./views/laptop.json"
 
+loadAudiolet = (extension) ->
+  path = "./Audiolet/src/audiolet/Audiolet#{extension}"
+  async.parallel
+    audiofile: async.apply fs.readFile, "./Audiolet/src/audiofile/audiofile.js", encoding: "utf-8"
+    audiolet:  async.apply fs.readFile, path, encoding: "utf-8"
+  , (err, files) ->
+    audiolet = "#{files.audiofile}\n#{files.audiolet}"
+    app.get "/javascript/Audiolet.js", (req, res) ->
+      res.set "Content-Type": "application/javascript; charset=utf-8"
+      res.send audiolet
+
 app.configure "production", ->
-  app.get "/javascript/Audiolet.js", (req, res) ->
-    res.sendfile "./Audiolet/src/audiolet/Audiolet.min.js"
+  loadAudiolet ".min.js"
 
 # Debug and logging
 app.configure "development", ->
+  loadAudiolet ".js"
+
   app.use require("express-error").express3
     contextLinesCount: 3
     handleUncaughtException: true
-
-  app.get "/javascript/Audiolet.js", (req, res) ->
-    res.sendfile "./Audiolet/src/audiolet/Audiolet.js"
 
 # Define port and start Server
 port = process.env.PORT or process.env.VMC_APP_PORT or 3000

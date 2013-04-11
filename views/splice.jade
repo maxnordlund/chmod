@@ -1,0 +1,12 @@
+extends layout
+
+append scripts
+  script(src="/javascript/splice.js")
+
+block content
+  p.
+    Välj den tidpunkt där övergången ska ske.
+  form
+    +range("Stopptid", "stop", 0, 0, 0.1)
+    +range("Starttid", "start", 0, 0, 0.1)
+    input(type="button", id="play", value="Spela")
