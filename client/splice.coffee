@@ -61,7 +61,6 @@ class Splice extends AudioletGroup
 
     @player.connect @outputs[0]
 
-
 $ ->
   stop  = new Range "stop"
   start = new Range "start"
