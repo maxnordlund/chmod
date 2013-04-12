@@ -1,19 +1,3 @@
-class Synth extends AudioletGroup
-  constructor: (audiolet, frequency) ->
-    super audiolet, 0, 1
-    @sine = new Sine @audiolet, frequency
-    @modulator = new Saw @audiolet, 2 * frequency
-    @modulatorMulAdd = new MulAdd @audiolet, frequency / 2, frequency
-    @gain = new Gain @audiolet
-    @envelope = new PercussiveEnvelope @audiolet, 1, 0.2, 0.5,
-      ( -> @audiolet.scheduler.addRelative 0, @remove.bind @ ).bind @
-
-    @modulator.connect @modulatorMulAdd
-    @modulatorMulAdd.connect @sine
-    @envelope.connect @gain, 0, 1
-    @sine.connect @gain
-    @gain.connect @outputs[0]
-
 class KarplusStrong extends AudioletNode
   constructor: (audiolet, frequency) ->
     super audiolet, 1, 1
@@ -29,7 +13,7 @@ class KarplusStrong extends AudioletNode
 
     numberOfChannels = input.samples.length
     numberOfBuffers  = @buffers.length
-    for i in [0..numberOfChannels - 1]
+    for i in [0...numberOfChannels]
       if i >= numberOfBuffers
         @buffers.push new Float32Array @period
 
@@ -68,7 +52,9 @@ class GitarrString extends AudioletGroup
     @gain.connect @outputs[0]
 
 class Range
-  constructor: (id) ->
+  base: [ "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#" ]
+
+  constructor: (id, @isNote=true) ->
     @input  = $("##{id} input")
     @output = $("##{id} output")
     @input.on "change", @change
@@ -76,23 +62,36 @@ class Range
 
   change: (event) =>
     @value = parseFloat do @input.val
-    @output.text @value
+    @output.text if @isNote then do @toString else @value
     return true
 
-# See http://en.wikipedia.org/wiki/Piano_key_frequencies
-note = (n) -> 440 * Math.pow 2, (n - 49) / 12
+  get: ->
+    # See http://en.wikipedia.org/wiki/Piano_key_frequencies
+    return 440 * Math.pow 2, (@value - 49) / 12
+
+  set: (note) ->
+    normalize = (n) -> Math.ceil Math.floor(n / 4) / (n / 4)
+    digit  = parseInt note.slice note.length - 1
+    letter = 1 + @base.indexOf note.slice 0, note.length - 1
+    @input.val letter + 12 * (digit - normalize letter)
+    @change null
+    return note
+
+  toString: -> "#{@base[(@value - 1) % 12]}#{Math.floor (@value + 8) / 12}"
 
 $ ->
-  frequency = new Range "frequency"
-  window.tunes = []
+  frequency = new Range "frequency", false
+  # CM11 (major eleventh)
+  window.notes = "C4-E4-G4-B4-D5-F#5".split "-"
   for i in [0..5]
-    tunes.push new Range "tune_#{i}"
+    range = new Range "tune_#{i}"
+    range.set notes[i]
+    notes[i] = range
 
   $play = $("#play")
   $play.on "click", (event) ->
     audiolet = new Audiolet
-    window.notes = tunes.map (tune) -> note tune.value
-    frequencyPattern = new PSequence notes, 1
+    frequencyPattern = new PSequence (do note.get for note in notes), 1
     durationPattern  = new PChoose [0.1, 0.15, 0.2, 0.25], 1
     audiolet.scheduler.play [frequencyPattern], 0.01, (tune) ->
       string = new GitarrString audiolet, tune

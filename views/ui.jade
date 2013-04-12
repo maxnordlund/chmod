@@ -7,14 +7,14 @@ block content
   nav
     a(href="/ui#k") K-Ord
     a(href="/ui#t") T-Ord
-      
+
   article
     section#controller
       button
         #recordButton
           svg(xmlns="http://www.w3.org/2000/svg")
             circle#record(cx="25", cy="25", r="22")
-            
+
       button
         #playButton
           svg(xmlns="http://www.w3.org/2000/svg")
@@ -29,10 +29,10 @@ block content
             - var y = 3
             - var width = 50
             - var height = 30
-            - var keyboard_height = width - height - y
-           
+            - var keyboardHeight = width - height - y
+
             rect#screen(x="#{x}", y="#{y}", width="#{width-2*x}", height="#{height-2*y}")
-            polygon#plate(points="#{x-1},#{height-2*y} #{width-x+1},#{height-2*y} #{width-x+5},#{height+keyboard_height} #{x-5},#{height+keyboard_height}")
+            polygon#plate(points="#{x-1},#{height-2*y} #{width-x+1},#{height-2*y} #{width-x+5},#{height+keyboardHeight} #{x-5},#{height+keyboardHeight}")
             g
             - for(var y = 30; y < 36; y += 3)
               - for(var x = 14; x < 34; x += 2)
@@ -42,7 +42,7 @@ block content
             polygon(points="18,36 30,36 30,38 18,38")
             rect#pad(x="18", y="39", width="14", height="6")
             polygon.play(points="30,30 30,45 45,37")
-            
+
     section#ordlist
       for word in t_words
           button(style='background-image: url("/images/#{word.toLowerCase()}_thumb.GIF")')= word
