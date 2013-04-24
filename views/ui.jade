@@ -26,10 +26,10 @@ block content
         #compPlayButton
           svg(xmlns="http://www.w3.org/2000/svg")
             - var x = 7
-            - var y = 3
+            - var y = 5
             - var width = 50
             - var height = 30
-            - var keyboardHeight = width - height - y
+            - var keyboardHeight = width - height - y / 2
 
             rect#screen(x="#{x}", y="#{y}", width="#{width-2*x}", height="#{height-2*y}")
             polygon#plate(points="#{x-1},#{height-2*y} #{width-x+1},#{height-2*y} #{width-x+5},#{height+keyboardHeight} #{x-5},#{height+keyboardHeight}")
