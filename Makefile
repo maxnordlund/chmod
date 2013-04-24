@@ -27,10 +27,12 @@ mp3   := $(wildcard audio/*.mp3)
 mp3   := $(mp3:audio/%.mp3=public/audio/%.wav)
 wav   := $(wildcard audio/*.wav)
 wav   := $(wav:audio/%.wav=public/audio/%.wav)
+gif   := $(wildcard images/*.gif)
+gif   := $(gif:images/%.gif=public/images/%.gif)
 
 .PHONY: clean dist run
 
-all: node_modules $(js) $(css) $(html) $(mp3) $(wav)
+all: node_modules $(js) $(css) $(html) $(mp3) $(wav) $(gif)
 
 run: all
 	@coffee server.coffee
@@ -54,6 +56,9 @@ public/xhtml:
 
 public/audio:
 	@mkdir -p public/audio
+
+public/images:
+	@mkdir -p public/images
 
 # Angular and Angular UI
 ########################
@@ -107,5 +112,9 @@ public/audio/%.wav: audio/%.mp3 public/audio
 	$(call done,$<,$@)
 
 public/audio/%.wav: audio/%.wav public/audio
+	@cp $< $@ 1> /dev/null
+	$(call done,$<,$@)
+
+public/images/%.gif: images/%.gif public/images
 	@cp $< $@ 1> /dev/null
 	$(call done,$<,$@)
